@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import pickle
 
 
 print("Loading Data...")
@@ -22,3 +23,7 @@ for i, row in enumerate(csv.reader(datafile, delimiter=',')):
 data = np.array(data).T
 tickers = np.array(tickers)
 print("Data Loaded!")
+print("Dumping!")
+pickle.dump(data, open("data.dat", "wb"))
+print("Dumped to data.dat!")
+print('Use: data = pickle.load(open("data.dat", "rb")) to load.')
