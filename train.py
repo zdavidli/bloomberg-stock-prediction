@@ -57,3 +57,10 @@ for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it i
     loss = loss_function(results, y)
     loss.backward()
     optimizer.step()
+
+PATH = 'model1.model'
+torch.save(model.state_dict(), PATH)
+
+model = LSTM(1, 100)
+model.load_state_dict(torch.load(PATH))
+
