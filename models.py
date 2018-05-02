@@ -14,11 +14,13 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.autograd import Variable
 from torch.nn.parameter import Parameter
-from tqdm import tqdm
+# from tqdm import tqdm
 
 import numpy as np
 
 torch.manual_seed(1)
+
+cuda = torch.device('cuda') 
 
 class LSTM(nn.Module):
     def __init__(self, input_size, hidden_size, dropout=0.2):
@@ -29,7 +31,7 @@ class LSTM(nn.Module):
         self.rnn = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
-            num_layers=1,
+            num_layers=2,
             dropout=dropout,
             bidirectional=False,
             bias=True, )
@@ -70,9 +72,9 @@ class LSTM(nn.Module):
         #out = self.relu1(out)
         #out = F.dropout(out, training=self.training, p=0.3)
         #out = self.bn2(self.fc2(out))
-        #out = self.bn1(self.fc1(out))
-        #out = self.relu2(out)
-        #out = F.dropout(out, training=self.training, p=0.3)
+        out = self.bn1(self.fc1(out))
+        out = self.relu2(out)
+        out = F.dropout(out, training=self.training, p=0.3)
         out = self.fc3(out)
         return out
 

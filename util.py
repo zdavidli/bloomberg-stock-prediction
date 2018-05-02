@@ -31,5 +31,5 @@ def create_batches(data, batch_length, normalized=True):
 	y = np.reshape(y, (m, n//batch_length, 1))
 
 	# last batch of X will not have a true label, remove it
-	#X, y = X[:-1], y[1:]
+	X, y = X[:-1], y[1:]
 	return X, y

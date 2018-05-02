@@ -23,17 +23,26 @@ import numpy as np
 from models import LSTM
 import util 
 
-model = LSTM(1, 100)
+model = LSTM(1, 64)
+model.cuda()
 loss_function = F.mse_loss #nn.NLLLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 
 data = pickle.load(open('data.dat', 'rb'))
-X, y = util.create_batches(data, batch_length=5)
+Xd, yd = util.create_batches(data, batch_length=100)
 
 # train on one stock
-X = Variable(torch.Tensor(X[0,:,:]))
-y = Variable(torch.Tensor(y[0,:,:]))
+
+split = 0.8
+print(Xd.shape)
+X = Variable(torch.Tensor(Xd[0,:int(len(Xd[0]) * split),:])).cuda()
+y = Variable(torch.Tensor(yd[0,:int(len(Xd[0]) * split),:])).cuda()
+# X = Variable(torch.Tensor(Xd[0,:,:])).cuda()
+# y = Variable(torch.Tensor(yd[0,:,:])).cuda()
+
+Xtest = Variable(torch.Tensor(Xd[0,int(len(Xd[0]) * split):,:])).cuda()
+ytest = Variable(torch.Tensor(yd[0,int(len(Xd[0]) * split):,:])).cuda()
 
 
 #print('X', X.size())
@@ -44,11 +53,7 @@ y = Variable(torch.Tensor(y[0,:,:]))
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
-# with torch.no_grad():
-#     inputs = prepare_sequence(training_data[0][0], word_to_ix)
-#     tag_scores = model(inputs)
-#     print(tag_scores)
-epochs = 40
+epochs = 400
 for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it is toy data
     # Step 1. Remember that Pytorch accumulates gradients.
     # We need to clear them out before each instance
@@ -74,9 +79,16 @@ for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it i
 
     print(epoch, loss)
 
-PATH = 'model1.model'
-torch.save(model.state_dict(), PATH)
+    with torch.no_grad():
 
-model = LSTM(1, 100)
-model.load_state_dict(torch.load(PATH))
+        results = model(Xtest)
+        loss = loss_function(results, ytest)
+
+        print(loss)
+
+# PATH = 'model1.model'
+# torch.save(model.state_dict(), PATH)
+
+# model = LSTM(1, 100)
+# model.load_state_dict(torch.load(PATH))
 
