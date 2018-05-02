@@ -3,6 +3,7 @@ import argparse
 import datetime
 import six
 import math
+import pickle
 
 import torch
 import torch.nn as nn
@@ -15,13 +16,17 @@ from torchvision import transforms
 from torch.autograd import Variable
 from torch.nn.parameter import Parameter
 # from tqdm import tqdm
-
 import numpy as np
+
+
+from models import LSTM
 
 model = LSTM(1, 100)
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
+
+x = pickle.load(open('data.dat', 'rb'))
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
