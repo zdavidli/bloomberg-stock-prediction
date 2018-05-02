@@ -15,18 +15,31 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.autograd import Variable
 from torch.nn.parameter import Parameter
+
 # from tqdm import tqdm
 import numpy as np
 
 
 from models import LSTM
+import util 
 
 model = LSTM(1, 100)
-loss_function = nn.NLLLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.1)
+loss_function = F.mse_loss #nn.NLLLoss()
+optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 
-x = pickle.load(open('data.dat', 'rb'))
+data = pickle.load(open('data.dat', 'rb'))
+X, y = util.create_batches(data, batch_length=100)
+
+# train on one stock
+X = Variable(torch.Tensor(X[0,:,:]))
+y = Variable(torch.Tensor(y[0,:,:]))
+
+#print(X)
+#print(y)
+
+#sys.exit()
+
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
@@ -50,13 +63,15 @@ for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it i
     # targets = prepare_sequence(tags, tag_to_ix)
 
     # Step 3. Run our forward pass.
-    results = model(x)
+    results = model(X)
 
     # Step 4. Compute the loss, gradients, and update the parameters by
     #  calling optimizer.step()
     loss = loss_function(results, y)
     loss.backward()
     optimizer.step()
+
+    print(epoch, loss)
 
 PATH = 'model1.model'
 torch.save(model.state_dict(), PATH)

@@ -18,8 +18,6 @@ from tqdm import tqdm
 
 import numpy as np
 
-print(torch.__version__)
-
 torch.manual_seed(1)
 
 class LSTM(nn.Module):
@@ -33,13 +31,13 @@ class LSTM(nn.Module):
             hidden_size=hidden_size,
             num_layers=3,
             dropout=dropout,
-            bidirectional=False,
-            bias=True, )
+            bidirectional=False,)
+            #bias=True, )
         self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.bn1 = nn.BatchNorm1d(hidden_size)
-        self.fc2 = nn.Linear(hidden_size, hidden_size / 2)
+        self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
         self.bn2 = nn.BatchNorm1d(hidden_size)
-        self.fc3 = nn.Linear(hidden_size / 2, 1)
+        self.fc3 = nn.Linear(hidden_size, 1)
         self.relu1 = nn.ReLU()
         self.relu2 = nn.ReLU()
 
@@ -60,10 +58,12 @@ class LSTM(nn.Module):
         outputs, (ht, ct) = self.rnn(x, (h0, c0))
 
         out = outputs[-1]  # We are only interested in the final prediction
-        out = self.bn1(self.fc1(out))
-        out = self.relu1(out)
-        out = F.dropout(out, training=self.training, p=0.3)
-        out = self.bn2(self.fc2(out))
+        #out = self.bn1(self.fc1(out))
+
+        #out = self.relu1(out)
+        #out = F.dropout(out, training=self.training, p=0.3)
+        #out = self.bn2(self.fc2(out))
+        out = self.fc1(out)
         out = self.relu2(out)
         out = F.dropout(out, training=self.training, p=0.3)
         out = self.fc3(out)
