@@ -23,7 +23,7 @@ import numpy as np
 from models import LSTM
 import util 
 
-model = LSTM(1, 100)
+model = LSTM(1, 500)
 loss_function = F.mse_loss #nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.001)
 

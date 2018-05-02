@@ -29,7 +29,7 @@ class LSTM(nn.Module):
         self.rnn = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
-            num_layers=3,
+            num_layers=1,
             dropout=dropout,
             bidirectional=False,)
             #bias=True, )
@@ -51,11 +51,13 @@ class LSTM(nn.Module):
         seq_length = x.size()[1]
 
         x = x.contiguous().view(seq_length, batch_size, -1)
+        # print(seq_length)
 
         # We need to pass the initial cell states
-        h0 = Variable(torch.zeros(seq_length, batch_size, self.hidden_size))
-        c0 = Variable(torch.zeros(seq_length, batch_size, self.hidden_size))
-        outputs, (ht, ct) = self.rnn(x, (h0, c0))
+        # h0 = Variable(torch.zeros(seq_length, batch_size, self.hidden_size))
+        # c0 = Variable(torch.zeros(seq_length, batch_size, self.hidden_size))
+        # outputs, (ht, ct) = self.rnn(x, (h0, c0))
+        outputs, (ht, ct) = self.rnn(x)
 
         out = outputs[-1]  # We are only interested in the final prediction
         #out = self.bn1(self.fc1(out))
@@ -63,7 +65,7 @@ class LSTM(nn.Module):
         #out = self.relu1(out)
         #out = F.dropout(out, training=self.training, p=0.3)
         #out = self.bn2(self.fc2(out))
-        out = self.fc1(out)
+        out = self.bn1(self.fc1(out))
         out = self.relu2(out)
         out = F.dropout(out, training=self.training, p=0.3)
         out = self.fc3(out)
