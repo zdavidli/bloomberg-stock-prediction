@@ -27,16 +27,21 @@ class LSTM(nn.Module):
         super(LSTM, self).__init__()
 
         self.hidden_size = hidden_size
+        self.bn0 = nn.BatchNorm1d(1)
         self.rnn = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
             num_layers=3,
             dropout=dropout,
-            bidirectional=False, )
+            bidirectional=False,
+            bias=True, )
         self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.bn1 = nn.BatchNorm1d(hidden_size)
-        self.fc2 = nn.Linear(hidden_size, 1)
-        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, hidden_size / 2)
+        self.bn2 = nn.BatchNorm1d(hidden_size)
+        self.fc3 = nn.Linear(hidden_size / 2, 1)
+        self.relu1 = nn.ReLU()
+        self.relu2 = nn.ReLU()
 
         # weight_ih_l[k] – the learnable input-hidden weights of the k-th layer, of shape (hidden_size * input_size) for k = 0. Otherwise, the shape is (hidden_size * hidden_size)
         # weight_hh_l[k] – the learnable hidden-hidden weights of the k-th layer, of shape (hidden_size * hidden_size)
@@ -56,9 +61,12 @@ class LSTM(nn.Module):
 
         out = outputs[-1]  # We are only interested in the final prediction
         out = self.bn1(self.fc1(out))
-        out = self.relu(out)
-        out = F.dropout(out, training=self.training)
-        out = self.fc2(out)
+        out = self.relu1(out)
+        out = F.dropout(out, training=self.training, p=0.3)
+        out = self.bn2(self.fc2(out))
+        out = self.relu2(out)
+        out = F.dropout(out, training=self.training, p=0.3)
+        out = self.fc3(out)
         return out
 
 class LSTMTagger(nn.Module):
@@ -92,4 +100,3 @@ class LSTMTagger(nn.Module):
         tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
         tag_scores = F.log_softmax(tag_space, dim=1)
         return tag_scores
-
