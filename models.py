@@ -31,8 +31,8 @@ class LSTM(nn.Module):
             hidden_size=hidden_size,
             num_layers=1,
             dropout=dropout,
-            bidirectional=False,)
-            #bias=True, )
+            bidirectional=False,
+            bias=True, )
         self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.bn1 = nn.BatchNorm1d(hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
@@ -51,6 +51,8 @@ class LSTM(nn.Module):
         seq_length = x.size()[1]
 
         x = x.contiguous().view(seq_length, batch_size, -1)
+        #print(x.size())
+
         # print(seq_length)
 
         # We need to pass the initial cell states
@@ -59,15 +61,18 @@ class LSTM(nn.Module):
         # outputs, (ht, ct) = self.rnn(x, (h0, c0))
         outputs, (ht, ct) = self.rnn(x)
 
+        #print(outputs)
         out = outputs[-1]  # We are only interested in the final prediction
+        
+        #print(out)
         #out = self.bn1(self.fc1(out))
 
         #out = self.relu1(out)
         #out = F.dropout(out, training=self.training, p=0.3)
         #out = self.bn2(self.fc2(out))
-        out = self.bn1(self.fc1(out))
-        out = self.relu2(out)
-        out = F.dropout(out, training=self.training, p=0.3)
+        #out = self.bn1(self.fc1(out))
+        #out = self.relu2(out)
+        #out = F.dropout(out, training=self.training, p=0.3)
         out = self.fc3(out)
         return out
 

@@ -23,20 +23,21 @@ import numpy as np
 from models import LSTM
 import util 
 
-model = LSTM(1, 500)
+model = LSTM(1, 100)
 loss_function = F.mse_loss #nn.NLLLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.01)
 
 
 data = pickle.load(open('data.dat', 'rb'))
-X, y = util.create_batches(data, batch_length=100)
+X, y = util.create_batches(data, batch_length=5)
 
 # train on one stock
 X = Variable(torch.Tensor(X[0,:,:]))
 y = Variable(torch.Tensor(y[0,:,:]))
 
-#print(X)
-#print(y)
+
+#print('X', X.size())
+#print('y', y.size())
 
 #sys.exit()
 
@@ -51,11 +52,11 @@ epochs = 40
 for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it is toy data
     # Step 1. Remember that Pytorch accumulates gradients.
     # We need to clear them out before each instance
-    # model.zero_grad()
+    model.zero_grad()
 
     # Also, we need to clear out the hidden state of the LSTM,
     # detaching it from its history on the last instance.
-    # model.hidden = model.init_hidden()
+    #model.hidden = model.init_hidden()
 
     # Step 2. Get our inputs ready for the network, that is, turn them into
     # Tensors of word indices.
