@@ -31,16 +31,16 @@ class LSTM(nn.Module):
         self.rnn = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
-            num_layers=2,
+            num_layers=1,
             dropout=dropout,
             bidirectional=False,
             bias=True, )
         self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.bn1 = nn.BatchNorm1d(hidden_size)
-        self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
+        self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.bn2 = nn.BatchNorm1d(hidden_size)
         self.fc3 = nn.Linear(hidden_size, 1)
-        self.relu1 = nn.ReLU()
+        self.relu1 = nn.Sigmoid()
         self.relu2 = nn.ReLU()
 
         # weight_ih_l[k] – the learnable input-hidden weights of the k-th layer, of shape (hidden_size * input_size) for k = 0. Otherwise, the shape is (hidden_size * hidden_size)
@@ -72,7 +72,10 @@ class LSTM(nn.Module):
         #out = self.relu1(out)
         #out = F.dropout(out, training=self.training, p=0.3)
         #out = self.bn2(self.fc2(out))
-        out = self.bn1(self.fc1(out))
+        out = self.fc1(out)
+        out = self.relu1(out)
+        out = F.dropout(out, training=self.training, p=0.3)
+        out = self.fc2(out)
         out = self.relu2(out)
         out = F.dropout(out, training=self.training, p=0.3)
         out = self.fc3(out)

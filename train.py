@@ -30,7 +30,9 @@ optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 
 data = pickle.load(open('data.dat', 'rb'))
-Xd, yd = util.create_batches(data, batch_length=100)
+m, n = data.shape
+data = np.reshape(data[:30], (1, 30 * n))
+Xd, yd = util.create_batches(data, batch_length=200)
 
 # train on one stock
 
