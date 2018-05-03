@@ -27,7 +27,7 @@ class LSTM(nn.Module):
         super(LSTM, self).__init__()
 
         self.hidden_size = hidden_size
-        self.bn0 = nn.BatchNorm1d(1)
+        # self.bn0 = nn.BatchNorm1d(1)
         self.rnn = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
@@ -36,9 +36,9 @@ class LSTM(nn.Module):
             bidirectional=False,
             bias=True, )
         self.fc1 = nn.Linear(hidden_size, hidden_size)
-        self.bn1 = nn.BatchNorm1d(hidden_size)
+        # self.bn1 = nn.BatchNorm1d(hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.bn2 = nn.BatchNorm1d(hidden_size)
+        # self.bn2 = nn.BatchNorm1d(hidden_size)
         self.fc3 = nn.Linear(hidden_size, 1)
         self.relu1 = nn.Sigmoid()
         self.relu2 = nn.ReLU()
@@ -61,10 +61,10 @@ class LSTM(nn.Module):
         # h0 = Variable(torch.zeros(seq_length, batch_size, self.hidden_size))
         # c0 = Variable(torch.zeros(seq_length, batch_size, self.hidden_size))
         # outputs, (ht, ct) = self.rnn(x, (h0, c0))
-        outputs, (ht, ct) = self.rnn(x)
+        out, _ = self.rnn(x)
 
         #print(outputs)
-        out = outputs[-1]  # We are only interested in the final prediction
+        out = out[-1]  # We are only interested in the final prediction
         
         #print(out)
         #out = self.bn1(self.fc1(out))

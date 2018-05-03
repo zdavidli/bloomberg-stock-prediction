@@ -26,18 +26,21 @@ import util
 model = LSTM(1, 64)
 model.cuda()
 loss_function = F.mse_loss #nn.NLLLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.01)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 
 data = pickle.load(open('data.dat', 'rb'))
 m, n = data.shape
-data = np.reshape(data[:30], (1, 30 * n))
-Xd, yd = util.create_batches(data, batch_length=200)
+stocks = 1
+data = np.reshape(data[:stocks], (1, stocks * n))
+# data = np.reshape(data[:30], (1, 30 * n))
+# Xd, yd = util.create_batches(data, batch_length=200)
+Xd, yd = util.sliding_window(data, batch_length=64, overlap=32)
 
 # train on one stock
 
-split = 0.8
-print(Xd.shape)
+split = 0.5
+# print(Xd.shape)
 X = Variable(torch.Tensor(Xd[0,:int(len(Xd[0]) * split),:])).cuda()
 y = Variable(torch.Tensor(yd[0,:int(len(Xd[0]) * split),:])).cuda()
 # X = Variable(torch.Tensor(Xd[0,:,:])).cuda()
@@ -45,6 +48,7 @@ y = Variable(torch.Tensor(yd[0,:int(len(Xd[0]) * split),:])).cuda()
 
 Xtest = Variable(torch.Tensor(Xd[0,int(len(Xd[0]) * split):,:])).cuda()
 ytest = Variable(torch.Tensor(yd[0,int(len(Xd[0]) * split):,:])).cuda()
+control = Variable(torch.Tensor(np.reshape(Xd[0,int(len(Xd[0]) * split):,-1], (len(Xd[0]) - int(len(Xd[0]) * split), 1)))).cuda()
 
 
 #print('X', X.size())
@@ -55,7 +59,7 @@ ytest = Variable(torch.Tensor(yd[0,int(len(Xd[0]) * split):,:])).cuda()
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
-epochs = 400
+epochs = 4000
 for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it is toy data
     # Step 1. Remember that Pytorch accumulates gradients.
     # We need to clear them out before each instance
@@ -79,14 +83,21 @@ for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it i
     loss.backward()
     optimizer.step()
 
-    print(epoch, loss)
+    # print(epoch, loss)
+    train = loss.cpu().data.numpy()
+    val = 0
 
     with torch.no_grad():
 
         results = model(Xtest)
         loss = loss_function(results, ytest)
+        val = loss.cpu().data.numpy()
+        # print(loss)
+        # results = Variable(torch.Tensor(Xtest.data[:,-1])).cuda()
+        # loss = loss_function(control, ytest)
 
-        print(loss)
+        # print(loss)
+    print(str(train) + "," + str(val))
 
 # PATH = 'model1.model'
 # torch.save(model.state_dict(), PATH)
