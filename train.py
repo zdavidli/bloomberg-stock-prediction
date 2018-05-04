@@ -34,15 +34,16 @@ stocks = 12
 data = np.reshape(data[:stocks], (1, stocks * n))
 # data = np.reshape(data[:30], (1, 30 * n))
 # Xd, yd = util.create_batches(data, batch_length=256)
-model = StockLSTM(64)
-model.cuda()
-loss_function = F.mse_loss #nn.NLLLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 epochs = 400
-for plus in [1, 2, 3, 4, 8, 16, 32]:
-    fname = 'csv/LSTMx2.64bs32o' + str(epochs) + 'epochs+' + str(plus) + 'transfer.csv'
+# for plus in [1, 2, 3, 4, 8, 16, 32]:
+for plus in [1,]:
+    fname = 'csv/LSTMx2.128bs64o' + str(epochs) + 'epochs+' + str(plus) + '.csv'
     print(fname)
     file = open(fname, 'w')
+    model = StockLSTM(64)
+    model.cuda()
+    loss_function = F.mse_loss #nn.NLLLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 
     Xd, yd = util.sliding_window(data, batch_length=64, overlap=32, plus=plus)
 
