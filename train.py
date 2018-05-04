@@ -36,7 +36,7 @@ data = np.reshape(data[:stocks], (1, stocks * n))
 # Xd, yd = util.create_batches(data, batch_length=256)
 epochs = 400
 for plus in [1, 2, 3, 4, 8, 16, 32]:
-    fname = 'csv/LSTMx2.128bs0o' + str(epochs) + 'epochs+' + str(plus) + '.csv'
+    fname = 'csv/LSTMx2.64bs0o' + str(epochs) + 'epochs+' + str(plus) + '.csv'
     print(fname)
     file = open(fname, 'w')
     model = StockLSTM(64)
@@ -44,7 +44,7 @@ for plus in [1, 2, 3, 4, 8, 16, 32]:
     loss_function = F.mse_loss #nn.NLLLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 
-    Xd, yd = util.sliding_window(data, batch_length=128, overlap=0, plus=plus)
+    Xd, yd = util.sliding_window(data, batch_length=64, overlap=0, plus=plus)
 
     # train on one stock
 
