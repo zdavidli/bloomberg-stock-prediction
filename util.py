@@ -49,7 +49,7 @@ def create_batches(data, batch_length, normalized=True):
 
 def sliding_window(data, batch_length, overlap, plus=1):
 	m, n = data.shape
-	windows = n // (batch_length - overlap) - batch_length//overlap
+	windows = n // (batch_length - overlap) - 2
 	X = np.ndarray((m, windows, batch_length))
 	y = np.ndarray((m, windows, 1))
 	for i in range(windows):
