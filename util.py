@@ -13,6 +13,7 @@ def create_batches(data, batch_length, normalized=True):
 	
 
 	# subtarct mean and divide by variance
+	y = X[:, 1:, -1]
 	mean = None
 	if normalized:
 		# subtract mean
@@ -31,7 +32,6 @@ def create_batches(data, batch_length, normalized=True):
 
 
 	# true label is the final price of the next batch
-	y = X[:, 1:, -1]
 	# mean = None
 	if normalized:
 		# subtract mean
@@ -55,28 +55,12 @@ def sliding_window(data, batch_length, overlap):
 	for i in range(windows):
 		X[:,i,:] = data[:,i*batch_length-i*overlap:i*batch_length-i*overlap+batch_length]
 		y[:,i,0] = data[:,i*batch_length-i*overlap + batch_length-overlap]
-		# print(X[:,i,:])
-		# print(y[:,i,0])
 		me = X[:,i,:].mean()
-		# std = X[:,i,:].std()
-		# print(y[:,i,0])
+		std = X[:,i,:].std()
 		X[:,i,:] -= me
 		y[:,i,0] -= me
-		# X[:,i,:] /= std
-		# y[:,i,0] /= std
-	# if normalized:
-	# 	# subtract mean
-	# 	mean = X.mean(axis=2, keepdims=True)
-	# 	X -= mean
-	# 	# print(X.shape)
+		X[:,i,:] /= std
+		y[:,i,0] /= std
 
-	# 	# divide by standard dev
-	# 	std = X.std(axis=2, keepdims=True)
-	# 	# std = np.repeat(std, batch_length, axis=2)
-	# 	# print(std.shape)
-	# 	# avoid divide by zero
-	# 	std[std == 0] = 1e-13
-	# 	X /= std
-		# print(X.shape)
 	return X, y
 

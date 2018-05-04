@@ -21,12 +21,14 @@ import numpy as np
 
 
 from models import LSTM
+from models import StockLSTM
+from models import LSTM2
 import util 
 
-model = LSTM(1, 64)
+model = StockLSTM(64)
 model.cuda()
 loss_function = F.mse_loss #nn.NLLLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 
 
 data = pickle.load(open('data.dat', 'rb'))
@@ -34,12 +36,12 @@ m, n = data.shape
 stocks = 2
 data = np.reshape(data[:stocks], (1, stocks * n))
 # data = np.reshape(data[:30], (1, 30 * n))
-# Xd, yd = util.create_batches(data, batch_length=200)
-Xd, yd = util.sliding_window(data, batch_length=64, overlap=16)
+# Xd, yd = util.create_batches(data, batch_length=256)
+Xd, yd = util.sliding_window(data, batch_length=128, overlap=64)
 
 # train on one stock
 
-split = 0.5
+split = 0.7
 # print(Xd.shape)
 X = Variable(torch.Tensor(Xd[0,:int(len(Xd[0]) * split),:])).cuda()
 y = Variable(torch.Tensor(yd[0,:int(len(Xd[0]) * split),:])).cuda()
@@ -64,16 +66,6 @@ for epoch in range(epochs):  # again, normally you would NOT do 300 epochs, it i
     # Step 1. Remember that Pytorch accumulates gradients.
     # We need to clear them out before each instance
     model.zero_grad()
-
-    # Also, we need to clear out the hidden state of the LSTM,
-    # detaching it from its history on the last instance.
-    #model.hidden = model.init_hidden()
-
-    # Step 2. Get our inputs ready for the network, that is, turn them into
-    # Tensors of word indices.
-    # sentence_in = prepare_sequence(sentence, word_to_ix)
-    # targets = prepare_sequence(tags, tag_to_ix)
-
     # Step 3. Run our forward pass.
     results = model(X)
 
