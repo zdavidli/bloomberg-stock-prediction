@@ -25,9 +25,7 @@ from models import StockLSTM
 from models import LSTM2
 import util 
 
-loss_function = F.mse_loss #nn.NLLLoss()
 # optimizer = optim.SGD(model.parameters(), lr=0.001)
-optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 
 
 data = pickle.load(open('data.dat', 'rb'))
@@ -43,6 +41,9 @@ for plus in [1, 2, 3, 4, 8, 16, 32]:
     file = open(fname, 'w')
     model = StockLSTM(64)
     model.cuda()
+    loss_function = F.mse_loss #nn.NLLLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
+    
     Xd, yd = util.sliding_window(data, batch_length=128, overlap=64, plus=plus)
 
     # train on one stock
