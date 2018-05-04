@@ -38,7 +38,7 @@ stocks = 2
 data = np.reshape(data[:stocks], (1, stocks * n))
 # data = np.reshape(data[:30], (1, 30 * n))
 # Xd, yd = util.create_batches(data, batch_length=256)
-Xd, yd = util.sliding_window(data, batch_length=64, overlap=32)
+Xd, yd = util.sliding_window(data, batch_length=32, overlap=16)
 
 # train on one stock
 
