@@ -28,7 +28,8 @@ import util
 model = StockLSTM(64)
 model.cuda()
 loss_function = F.mse_loss #nn.NLLLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
+optimizer = optim.SGD(model.parameters(), lr=0.001)
+# optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 
 
 data = pickle.load(open('data.dat', 'rb'))
