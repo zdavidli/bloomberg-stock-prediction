@@ -28,6 +28,7 @@ import util
 model = StockLSTM(64)
 model.cuda()
 loss_function = F.mse_loss #nn.NLLLoss()
+# optimizer = optim.SGD(model.parameters(), lr=0.001)
 optimizer = optim.Adam(model.parameters(), lr=0.001, eps=1e-6)
 
 
@@ -37,7 +38,7 @@ stocks = 2
 data = np.reshape(data[:stocks], (1, stocks * n))
 # data = np.reshape(data[:30], (1, 30 * n))
 # Xd, yd = util.create_batches(data, batch_length=256)
-Xd, yd = util.sliding_window(data, batch_length=128, overlap=64)
+Xd, yd = util.sliding_window(data, batch_length=64, overlap=32)
 
 # train on one stock
 
